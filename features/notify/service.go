@@ -2,8 +2,10 @@ package notify
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/larb26656/line-notify-adapter/errs"
 	"github.com/larb26656/line-notify-adapter/external/line_bot"
 )
 
@@ -21,11 +23,11 @@ func NewNotifyService(lineBotService line_bot.LineBotService) NotifyService {
 	}
 }
 
-func (s *notifyService) extractAuthorization(key string) (string, string, error) {
-	parts := strings.Split(key, "_targetKey_")
+func (s *notifyService) extractAuthorization(token string) (string, string, error) {
+	parts := strings.Split(token, "_targetKey_")
 
 	if len(parts) != 2 {
-		return "", "", errors.New("invalid key format")
+		return "", "", errors.Join(errs.ErrInvalidAccessToken, fmt.Errorf("invalid token pattern"))
 	}
 
 	channelAccessToken := parts[0]

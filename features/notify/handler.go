@@ -1,10 +1,12 @@
 package notify
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/larb26656/line-notify-adapter/errs"
 	"github.com/larb26656/line-notify-adapter/utils"
 )
 
@@ -54,6 +56,14 @@ func (h *notifyHandler) SendNotify(c *gin.Context) {
 	notifyRes, err := h.NotifyService.SendNotify(token, message)
 
 	if err != nil {
+		if errors.Is(err, errs.ErrInvalidAccessToken) {
+			c.JSON(http.StatusUnauthorized, &SendNotifyRes{
+				Status:  401,
+				Message: "Invalid access token",
+			})
+			return
+		}
+
 		log.Printf("Error sending notification: %v", err)
 		c.JSON(http.StatusInternalServerError, &SendNotifyRes{
 			Status:  500,

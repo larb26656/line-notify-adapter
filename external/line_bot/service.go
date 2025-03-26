@@ -3,9 +3,12 @@ package line_bot
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/larb26656/line-notify-adapter/errs"
 )
 
 type LineBotService interface {
@@ -51,6 +54,10 @@ func (s *lineBotService) SendMessage(accessToken string, to string, messageText 
 		return fmt.Errorf("failed to send request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return errors.Join(errs.ErrInvalidAccessToken, fmt.Errorf("failed to send message, status: %d", resp.StatusCode))
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
