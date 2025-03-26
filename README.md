@@ -58,7 +58,7 @@ The authorization token follows a specific pattern:
 **Example Token:**
 
 ```
-a1b2c3d4e5f6g7h8_TARGET_U1234567890
+a1b2c3d4e5f6g7h8_targetKey_U1234567890
 ```
 
 ### Sending a Notification
@@ -67,7 +67,7 @@ To send a notification, use the following curl command:
 
 ```bash
 curl --location 'http://localhost:8080/api/v1/notify' \
---header 'Authorization: Bearer a1b2c3d4e5f6g7h8_TARGET_U1234567890' \
+--header 'Authorization: Bearer a1b2c3d4e5f6g7h8_targetKey_U1234567890' \
 --form 'message="test message"'
 ```
 
