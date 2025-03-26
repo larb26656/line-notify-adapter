@@ -4,12 +4,18 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/larb26656/line-notify-adapter/external/line_bot"
 	"github.com/larb26656/line-notify-adapter/features/notify"
 )
 
 func setupRoute(r *gin.Engine) {
+	// External
+	// Serivce
+	lineMessageService := line_bot.NewLineBotService()
+
+	// Internal
 	// Service
-	notifyService := notify.NewNotifyService()
+	notifyService := notify.NewNotifyService(lineMessageService)
 
 	// Handler
 	notifyHandler := notify.NewNotifyHandler(notifyService)

@@ -3,19 +3,25 @@ package notify
 import (
 	"errors"
 	"strings"
+
+	"github.com/larb26656/line-notify-adapter/external/line_bot"
 )
 
 type NotifyService interface {
-	SendNotify(key string) (*SendNotifyRes, error)
+	SendNotify(token string, message string) (*SendNotifyRes, error)
 }
 
-type notifyService struct{}
-
-func NewNotifyService() NotifyService {
-	return &notifyService{}
+type notifyService struct {
+	LineBotService line_bot.LineBotService
 }
 
-func (s *notifyService) extractKey(key string) (string, string, error) {
+func NewNotifyService(lineBotService line_bot.LineBotService) NotifyService {
+	return &notifyService{
+		LineBotService: lineBotService,
+	}
+}
+
+func (s *notifyService) extractAuthorization(key string) (string, string, error) {
 	parts := strings.Split(key, "_targetKey_")
 
 	if len(parts) != 2 {
@@ -28,9 +34,14 @@ func (s *notifyService) extractKey(key string) (string, string, error) {
 	return channelAccessToken, targetToken, nil
 }
 
-func (s *notifyService) SendNotify(key string) (*SendNotifyRes, error) {
-	// TODO implement line message client
-	_, _, err := s.extractKey(key)
+func (s *notifyService) SendNotify(token string, message string) (*SendNotifyRes, error) {
+	channelAccessToken, targetToken, err := s.extractAuthorization(token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.LineBotService.SendMessage(channelAccessToken, targetToken, message)
 
 	if err != nil {
 		return nil, err
